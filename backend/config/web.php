@@ -5,7 +5,7 @@ $config = [
     'defaultRoute'=>'timeline-event/index',
     'controllerMap'=>[
         'file-manager-elfinder' => [
-            'class' => 'mihaildev\elfinder\Controller',
+            'class' => mihaildev\elfinder\Controller::class,
             'access' => ['manager'],
             'disabledCommands' => ['netmount'],
             'roots' => [
@@ -23,26 +23,25 @@ $config = [
             'errorAction' => 'site/error',
         ],
         'request' => [
-            'baseUrl' => '/admin',
             'cookieValidationKey' => env('BACKEND_COOKIE_VALIDATION_KEY')
         ],
         'user' => [
-            'class'=>'yii\web\User',
-            'identityClass' => 'common\models\User',
-            'loginUrl'=>['sign-in/login'],
+            'class' => yii\web\User::class,
+            'identityClass' => common\models\User::class,
+            'loginUrl' => ['sign-in/login'],
             'enableAutoLogin' => true,
-            'as afterLogin' => 'common\behaviors\LoginTimestampBehavior'
+            'as afterLogin' => common\behaviors\LoginTimestampBehavior::class
         ],
     ],
     'modules'=>[
         'i18n' => [
-            'class' => 'backend\modules\i18n\Module',
-            'defaultRoute'=>'i18n-message/index'
+            'class' => backend\modules\i18n\Module::class,
+            'defaultRoute' => 'i18n-message/index'
         ]
     ],
-    'as globalAccess'=>[
-        'class'=>'\common\behaviors\GlobalAccessBehavior',
-        'rules'=>[
+    'as globalAccess' => [
+        'class' => common\behaviors\GlobalAccessBehavior::class,
+        'rules' => [
             [
                 'controllers'=>['sign-in'],
                 'allow' => true,
@@ -85,11 +84,11 @@ $config = [
 
 if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
-        'class'=>'yii\gii\Module',
+        'class' => yii\gii\Module::class,
         'generators' => [
             'crud' => [
-                'class'=>'yii\gii\generators\crud\Generator',
-                'templates'=>[
+                'class' => yii\gii\generators\crud\Generator::class,
+                'templates' => [
                     'yii2-starter-kit' => Yii::getAlias('@backend/views/_gii/templates')
                 ],
                 'template' => 'yii2-starter-kit',
