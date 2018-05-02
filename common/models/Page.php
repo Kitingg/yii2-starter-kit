@@ -33,14 +33,25 @@ class Page extends ActiveRecord
     }
 
     /**
+     * @return array statuses list
+     */
+    public static function statuses()
+    {
+        return [
+            self::STATUS_DRAFT => Yii::t('common', 'Draft'),
+            self::STATUS_PUBLISHED => Yii::t('common', 'Published'),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            TimestampBehavior::class,
             'slug' => [
-                'class' => SluggableBehavior::className(),
+                'class' => SluggableBehavior::class,
                 'attribute' => 'title',
                 'ensureUnique' => true,
                 'immutable' => true

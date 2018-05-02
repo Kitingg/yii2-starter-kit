@@ -1,9 +1,11 @@
 <?php
 /**
- * @var $this yii\web\View
+ * @var $this    yii\web\View
+ * @var $content string
  */
+
 use backend\assets\BackendAsset;
-use backend\models\SystemLog;
+use backend\modules\system\models\SystemLog;
 use backend\widgets\Menu;
 use common\models\TimelineEvent;
 use yii\bootstrap\Alert;
@@ -14,8 +16,11 @@ use yii\log\Logger;
 use yii\widgets\Breadcrumbs;
 
 $bundle = BackendAsset::register($this);
+
 ?>
+
 <?php $this->beginContent('@backend/views/layouts/base.php'); ?>
+
 <div class="wrapper">
     <!-- header logo: style can be found in header.less -->
     <header class="main-header">
@@ -38,8 +43,8 @@ $bundle = BackendAsset::register($this);
                         <a href="<?php echo Url::to(['/timeline-event/index']) ?>">
                             <i class="fa fa-bell"></i>
                             <span class="label label-success">
-                                    <?php echo TimelineEvent::find()->today()->count() ?>
-                                </span>
+                                <?php echo TimelineEvent::find()->today()->count() ?>
+                            </span>
                         </a>
                     </li>
                     <!-- Notifications: style can be found in dropdown.less -->
@@ -57,7 +62,7 @@ $bundle = BackendAsset::register($this);
                                 <ul class="menu">
                                     <?php foreach (SystemLog::find()->orderBy(['log_time' => SORT_DESC])->limit(5)->all() as $logEntry): ?>
                                         <li>
-                                            <a href="<?php echo Yii::$app->urlManager->createUrl(['/log/view', 'id' => $logEntry->id]) ?>">
+                                            <a href="<?php echo Yii::$app->urlManager->createUrl(['/system/log/view', 'id' => $logEntry->id]) ?>">
                                                 <i class="fa fa-warning <?php echo $logEntry->level === Logger::LEVEL_ERROR ? 'text-red' : 'text-yellow' ?>"></i>
                                                 <?php echo $logEntry->category ?>
                                             </a>
@@ -66,7 +71,7 @@ $bundle = BackendAsset::register($this);
                                 </ul>
                             </li>
                             <li class="footer">
-                                <?php echo Html::a(Yii::t('backend', 'View all'), ['/log/index']) ?>
+                                <?php echo Html::a(Yii::t('backend', 'View all'), ['/system/log/index']) ?>
                             </li>
                         </ul>
                     </li>
@@ -103,7 +108,7 @@ $bundle = BackendAsset::register($this);
                         </ul>
                     </li>
                     <li>
-                        <?php echo Html::a('<i class="fa fa-cogs"></i>', ['/site/settings']) ?>
+                        <?php echo Html::a('<i class="fa fa-cogs"></i>', ['/system/settings']) ?>
                     </li>
                 </ul>
             </div>
@@ -136,7 +141,7 @@ $bundle = BackendAsset::register($this);
                 'items' => [
                     [
                         'label' => Yii::t('backend', 'Main'),
-                        'options' => ['class' => 'header']
+                        'options' => ['class' => 'header'],
                     ],
                     [
                         'label' => Yii::t('backend', 'Timeline'),
@@ -146,64 +151,158 @@ $bundle = BackendAsset::register($this);
                         'badgeBgClass' => 'label-success',
                     ],
                     [
-                        'label' => Yii::t('backend', 'Content'),
-                        'url' => '#',
-                        'icon' => '<i class="fa fa-edit"></i>',
-                        'options' => ['class' => 'treeview'],
-                        'items' => [
-                            ['label' => Yii::t('backend', 'Static pages'), 'url' => ['/page/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Articles'), 'url' => ['/article/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Article Categories'), 'url' => ['/article-category/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Text Widgets'), 'url' => ['/widget-text/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Menu Widgets'), 'url' => ['/widget-menu/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Carousel Widgets'), 'url' => ['/widget-carousel/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                        ]
-                    ],
-                    [
-                        'label' => Yii::t('backend', 'System'),
-                        'options' => ['class' => 'header']
-                    ],
-                    [
                         'label' => Yii::t('backend', 'Users'),
                         'icon' => '<i class="fa fa-users"></i>',
                         'url' => ['/user/index'],
-                        'visible' => Yii::$app->user->can('administrator')
+                        'active' => (Yii::$app->controller->id == 'user'),
+                        'visible' => Yii::$app->user->can('administrator'),
                     ],
                     [
-                        'label' => Yii::t('backend', 'Other'),
+                        'label' => Yii::t('backend', 'Content'),
+                        'options' => ['class' => 'header'],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Static pages'),
+                        'url' => ['/content/page/index'],
+                        'icon' => '<i class="fa fa-thumb-tack"></i>',
+                        'active' => (Yii::$app->controller->id == 'page'),
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Articles'),
                         'url' => '#',
-                        'icon' => '<i class="fa fa-cogs"></i>',
+                        'icon' => '<i class="fa fa-files-o"></i>',
                         'options' => ['class' => 'treeview'],
+                        'active' => (Yii::$app->controller->module->id == 'article'),
                         'items' => [
                             [
-                                'label' => Yii::t('backend', 'i18n'),
-                                'url' => '#',
-                                'icon' => '<i class="fa fa-flag"></i>',
-                                'options' => ['class' => 'treeview'],
-                                'items' => [
-                                    ['label' => Yii::t('backend', 'i18n Source Message'), 'url' => ['/i18n/i18n-source-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                                    ['label' => Yii::t('backend', 'i18n Message'), 'url' => ['/i18n/i18n-message/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                                ]
-                            ],
-                            ['label' => Yii::t('backend', 'Key-Value Storage'), 'url' => ['/key-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'File Storage'), 'url' => ['/file-storage/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'Cache'), 'url' => ['/cache/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            ['label' => Yii::t('backend', 'File Manager'), 'url' => ['/file-manager/index'], 'icon' => '<i class="fa fa-angle-double-right"></i>'],
-                            [
-                                'label' => Yii::t('backend', 'System Information'),
-                                'url' => ['/system-information/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>'
+                                'label' => Yii::t('backend', 'Articles'),
+                                'url' => ['/content/article/index'],
+                                'icon' => '<i class="fa fa-file-o"></i>',
+                                'active' => (Yii::$app->controller->id == 'default'),
                             ],
                             [
-                                'label' => Yii::t('backend', 'Logs'),
-                                'url' => ['/log/index'],
-                                'icon' => '<i class="fa fa-angle-double-right"></i>',
-                                'badge' => SystemLog::find()->count(),
-                                'badgeBgClass' => 'label-danger',
+                                'label' => Yii::t('backend', 'Categories'),
+                                'url' => ['/content/category/index'],
+                                'icon' => '<i class="fa fa-folder-open-o"></i>',
+                                'active' => (Yii::$app->controller->id == 'category'),
                             ],
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Widgets'),
+                        'url' => '#',
+                        'icon' => '<i class="fa fa-code"></i>',
+                        'options' => ['class' => 'treeview'],
+                        'active' => (Yii::$app->controller->module->id == 'widget'),
+                        'items' => [
+                            [
+                                'label' => Yii::t('backend', 'Text Blocks'),
+                                'url' => ['/widget/text/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                                'active' => (Yii::$app->controller->id == 'text'),
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Menu'),
+                                'url' => ['/widget/menu/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                                'active' => (Yii::$app->controller->id == 'menu'),
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Carousel'),
+                                'url' => ['/widget/carousel/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                                'active' => in_array(Yii::$app->controller->id, ['carousel', 'carousel-item']),
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Translation'),
+                        'options' => ['class' => 'header'],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Translation'),
+                        'url' => ['/translation/default/index'],
+                        'icon' => '<i class="fa fa-language"></i>',
+                        'active' => (Yii::$app->controller->module->id == 'translation'),
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'System'),
+                        'options' => ['class' => 'header'],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'RBAC Rules'),
+                        'url' => '#',
+                        'icon' => '<i class="fa fa-flag"></i>',
+                        'options' => ['class' => 'treeview'],
+                        'active' => in_array(Yii::$app->controller->id, ['rbac-auth-assignment', 'rbac-auth-item', 'rbac-auth-item-child', 'rbac-auth-rule']),
+                        'items' => [
+                            [
+                                'label' => Yii::t('backend', 'Auth Assignment'),
+                                'url' => ['/rbac/rbac-auth-assignment/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Auth Items'),
+                                'url' => ['/rbac/rbac-auth-item/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Auth Item Child'),
+                                'url' => ['/rbac/rbac-auth-item-child/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Auth Rules'),
+                                'url' => ['/rbac/rbac-auth-rule/index'],
+                                'icon' => '<i class="fa fa-circle-o"></i>',
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Files'),
+                        'url' => '#',
+                        'icon' => '<i class="fa fa-th-large"></i>',
+                        'options' => ['class' => 'treeview'],
+                        'active' => (Yii::$app->controller->module->id == 'file'),
+                        'items' => [
+                            [
+                                'label' => Yii::t('backend', 'Storage'),
+                                'url' => ['/file/storage/index'],
+                                'icon' => '<i class="fa fa-database"></i>',
+                                'active' => (Yii::$app->controller->id == 'storage'),
+                            ],
+                            [
+                                'label' => Yii::t('backend', 'Manager'),
+                                'url' => ['/file/manager/index'],
+                                'icon' => '<i class="fa fa-television"></i>',
+                                'active' => (Yii::$app->controller->id == 'manager'),
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Key-Value Storage'),
+                        'url' => ['/system/key-storage/index'],
+                        'icon' => '<i class="fa fa-arrows-h"></i>',
+                        'active' => (Yii::$app->controller->id == 'key-storage'),
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Cache'),
+                        'url' => ['/system/cache/index'],
+                        'icon' => '<i class="fa fa-refresh"></i>',
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'System Information'),
+                        'url' => ['/system/information/index'],
+                        'icon' => '<i class="fa fa-dashboard"></i>',
+                    ],
+                    [
+                        'label' => Yii::t('backend', 'Logs'),
+                        'url' => ['/system/log/index'],
+                        'icon' => '<i class="fa fa-warning"></i>',
+                        'badge' => SystemLog::find()->count(),
+                        'badgeBgClass' => 'label-danger',
+                    ],
+                ],
             ]) ?>
         </section>
         <!-- /.sidebar -->

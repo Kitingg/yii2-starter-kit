@@ -13,31 +13,31 @@ use yii\db\ActiveRecord;
 /**
  * This is the model class for table "article".
  *
- * @property integer $id
- * @property string $slug
- * @property string $title
- * @property string $body
- * @property string $view
- * @property string $thumbnail_base_url
- * @property string $thumbnail_path
- * @property array $attachments
- * @property integer $category_id
- * @property integer $status
- * @property integer $published_at
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $created_at
- * @property integer $updated_at
+ * @property integer             $id
+ * @property string              $slug
+ * @property string              $title
+ * @property string              $body
+ * @property string              $view
+ * @property string              $thumbnail_base_url
+ * @property string              $thumbnail_path
+ * @property array               $attachments
+ * @property integer             $category_id
+ * @property integer             $status
+ * @property integer             $published_at
+ * @property integer             $created_by
+ * @property integer             $updated_by
+ * @property integer             $created_at
+ * @property integer             $updated_at
  *
- * @property User $author
- * @property User $updater
- * @property ArticleCategory $category
+ * @property User                $author
+ * @property User                $updater
+ * @property ArticleCategory     $category
  * @property ArticleAttachment[] $articleAttachments
  */
 class Article extends ActiveRecord
 {
     const STATUS_PUBLISHED = 1;
-    const STATUS_DRAFT = 0;
+    const STATUS_DRAFT     = 0;
 
     /**
      * @var array
@@ -66,20 +66,31 @@ class Article extends ActiveRecord
     }
 
     /**
+     * @return array statuses list
+     */
+    public static function statuses()
+    {
+        return [
+            self::STATUS_DRAFT => Yii::t('common', 'Draft'),
+            self::STATUS_PUBLISHED => Yii::t('common', 'Published'),
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
-            BlameableBehavior::className(),
+            TimestampBehavior::class,
+            BlameableBehavior::class,
             [
-                'class' => SluggableBehavior::className(),
+                'class' => SluggableBehavior::class,
                 'attribute' => 'title',
-                'immutable' => true
+                'immutable' => true,
             ],
             [
-                'class' => UploadBehavior::className(),
+                'class' => UploadBehavior::class,
                 'attribute' => 'attachments',
                 'multiple' => true,
                 'uploadRelation' => 'articleAttachments',
@@ -91,11 +102,11 @@ class Article extends ActiveRecord
                 'nameAttribute' => 'name',
             ],
             [
-                'class' => UploadBehavior::className(),
+                'class' => UploadBehavior::class,
                 'attribute' => 'thumbnail',
                 'pathAttribute' => 'thumbnail_path',
-                'baseUrlAttribute' => 'thumbnail_base_url'
-            ]
+                'baseUrlAttribute' => 'thumbnail_base_url',
+            ],
         ];
     }
 
@@ -112,12 +123,12 @@ class Article extends ActiveRecord
                 return date(DATE_ISO8601);
             }],
             [['published_at'], 'filter', 'filter' => 'strtotime', 'skipOnEmpty' => true],
-            [['category_id'], 'exist', 'targetClass' => ArticleCategory::className(), 'targetAttribute' => 'id'],
+            [['category_id'], 'exist', 'targetClass' => ArticleCategory::class, 'targetAttribute' => 'id'],
             [['status'], 'integer'],
             [['slug', 'thumbnail_base_url', 'thumbnail_path'], 'string', 'max' => 1024],
             [['title'], 'string', 'max' => 512],
             [['view'], 'string', 'max' => 255],
-            [['attachments', 'thumbnail'], 'safe']
+            [['attachments', 'thumbnail'], 'safe'],
         ];
     }
 
@@ -139,7 +150,7 @@ class Article extends ActiveRecord
             'created_by' => Yii::t('common', 'Author'),
             'updated_by' => Yii::t('common', 'Updater'),
             'created_at' => Yii::t('common', 'Created At'),
-            'updated_at' => Yii::t('common', 'Updated At')
+            'updated_at' => Yii::t('common', 'Updated At'),
         ];
     }
 
@@ -148,7 +159,7 @@ class Article extends ActiveRecord
      */
     public function getAuthor()
     {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
+        return $this->hasOne(User::class, ['id' => 'created_by']);
     }
 
     /**
@@ -156,7 +167,7 @@ class Article extends ActiveRecord
      */
     public function getUpdater()
     {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 
     /**
@@ -164,7 +175,7 @@ class Article extends ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(ArticleCategory::className(), ['id' => 'category_id']);
+        return $this->hasOne(ArticleCategory::class, ['id' => 'category_id']);
     }
 
     /**
@@ -172,6 +183,6 @@ class Article extends ActiveRecord
      */
     public function getArticleAttachments()
     {
-        return $this->hasMany(ArticleAttachment::className(), ['article_id' => 'id']);
+        return $this->hasMany(ArticleAttachment::class, ['article_id' => 'id']);
     }
 }
